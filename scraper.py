@@ -8,15 +8,23 @@ def main():
         page = browser.new_page()
         page.goto("https://quotes.toscrape.com/js/")
         
-        page.wait_for_selector(".quote")
-        
         data = []
-        for quote in page.query_selector_all(".quote"):
-            text = quote.query_selector(".text").inner_text().strip()
-            author = quote.query_selector(".author").inner_text().strip()
-            tags = [t.inner_text().strip() for t in quote.query_selector_all(".tag")]
+        
+        while True:
+            page.wait_for_selector(".quote")
             
-            data.append({"author": author, "quote": text, "tags": tags})
+            for quote in page.query_selector_all(".quote"):
+                text = quote.query_selector(".text").inner_text().strip()
+                author = quote.query_selector(".author").inner_text().strip()
+                tags = [t.inner_text().strip() for t in quote.query_selector_all(".tag")]
+                
+                data.append({"author": author, "quote": text, "tags": tags})
+            
+            next_button = page.query_selector(".next > a")
+            if next_button:
+                next_button.click()
+            else:
+                break
             
         browser.close()
         
